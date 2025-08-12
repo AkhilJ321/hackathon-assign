@@ -155,7 +155,9 @@ export default function Dashboard() {
         <Typography variant="h5" fontWeight="bold">
           Analytics Dashboard
         </Typography>
-        <Button variant="contained">Download</Button>
+        <Button variant="contained" onClick={() => window.print()}>
+          Download
+        </Button>
       </Box>
 
       {/* Dropdowns

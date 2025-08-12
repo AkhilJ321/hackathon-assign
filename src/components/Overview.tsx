@@ -70,7 +70,7 @@ const Overview = () => {
         style={{
           textAlign: "center",
           marginBottom: "2rem",
-          color: "blue",
+          color: "black",
         }}
       >
         Overview
@@ -98,7 +98,7 @@ const Overview = () => {
             minWidth: "250px",
           }}
         >
-          <h4 style={{ textAlign: "center", color: "#6366f1" }}>
+          <h4 style={{ textAlign: "center", color: "black" }}>
             Cluster Percentage
           </h4>
           <PieChart width={400} height={300}>
@@ -161,7 +161,7 @@ const Overview = () => {
             minWidth: "300px", // <-- Increased minWidth for better visibility
           }}
         >
-          <h4 style={{ textAlign: "center", color: "#6366f1" }}>
+          <h4 style={{ textAlign: "center", color: "#black" }}>
             Gender Wise Distribution
           </h4>
           <BarChart

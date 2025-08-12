@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Grid,
@@ -26,44 +26,79 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-
-const CLUSTERS = [
-  "Mature High Spender",
-  "Mature Low Spender",
-  "Young High Spender",
-  "Young Low Spender",
-];
-
-const radarData = [
-  { subject: "Age", A: 40, fullMark: 100 },
-  { subject: "Social Media", A: 60, fullMark: 100 },
-  { subject: "Calls", A: 80, fullMark: 100 },
-  { subject: "E-commerce", A: 90, fullMark: 100 },
-];
-
-const barData = [
-  { name: "Social Media", value: 3.2 },
-  { name: "Calls", value: 120 },
-  { name: "E-commerce", value: 5000 },
-];
-
-const quadrantData = [
-  { x: 1, y: 2, label: "A" },
-  { x: 2, y: 3, label: "B" },
-  { x: 3, y: 1, label: "C" },
-  { x: 4, y: 4, label: "D" },
-];
-
-const tableRows = [
-  "Insight 1",
-  "Insight 2",
-  "Insight 3",
-  "Insight 4",
-  "Insight 5",
-];
+import {
+  getClusterSummary,
+  getUserData,
+  type ClusterSummary,
+  type UserData,
+} from "../utils/clusterWiseDistribution";
 
 export default function ClusterWiseData() {
-  const [selectedCluster, setSelectedCluster] = useState(CLUSTERS[0]);
+  const [clusters, setClusters] = useState<ClusterSummary[]>([]);
+  const [users, setUsers] = useState<UserData[]>([]);
+  const [selectedCluster, setSelectedCluster] = useState<number>(0);
+
+  useEffect(() => {
+    getClusterSummary().then(setClusters);
+    getUserData().then(setUsers);
+  }, []);
+
+  // Map cluster number to name
+  const clusterOptions = clusters.map((c) => ({
+    value: c.Cluster,
+    label: c.name,
+  }));
+
+  // Filtered cluster summary
+  const clusterSummary = clusters.find((c) => c.Cluster === selectedCluster);
+
+  // Filtered users
+  const clusterUsers = users.filter((u) => u.Cluster === selectedCluster);
+
+  // Radar chart data
+  const radarData = clusterSummary
+    ? [
+        { subject: "Age", A: clusterSummary.Age, fullMark: 100 },
+        {
+          subject: "Social Media",
+          A: clusterSummary["Social Media Time (hrs/day)"],
+          fullMark: 10,
+        },
+        {
+          subject: "Calls",
+          A: clusterSummary["Calls Duration (mins/day)"],
+          fullMark: 300,
+        },
+        {
+          subject: "E-commerce",
+          A: clusterSummary["E-commerce Spend (INR/month)"],
+          fullMark: 10000,
+        },
+      ]
+    : [];
+
+  // Bar chart data
+  const barData = clusterUsers.slice(0, 20).map((u) => ({
+    name: u.Location,
+    "Monthly Spend": u["Total expenditure"],
+    "E-commerce Spend": u["E-commerce Spend (INR/month)"],
+  }));
+
+  // Quadrant chart data
+  const quadrantData = clusterUsers.slice(0, 20).map((u) => ({
+    x: u["Screen Time (hrs/day)"],
+    y: u["Total expenditure"],
+    label: u.Location,
+  }));
+
+  // Top 5 cities
+  const cityCount: Record<string, number> = {};
+  clusterUsers.forEach((u) => {
+    cityCount[u.Location] = (cityCount[u.Location] || 0) + 1;
+  });
+  const topCities = Object.entries(cityCount)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5);
 
   return (
     <Box p={3}>
@@ -73,18 +108,18 @@ export default function ClusterWiseData() {
       <Box mb={3}>
         <Select
           value={selectedCluster}
-          onChange={(e) => setSelectedCluster(e.target.value)}
+          onChange={(e) => setSelectedCluster(Number(e.target.value))}
           sx={{ minWidth: 220 }}
         >
-          {CLUSTERS.map((cluster) => (
-            <MenuItem key={cluster} value={cluster}>
-              {cluster}
+          {clusterOptions.map((opt) => (
+            <MenuItem key={opt.value} value={opt.value}>
+              {opt.label}
             </MenuItem>
           ))}
         </Select>
       </Box>
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid item xs={12} md={6}>
           <Card>
             <CardContent>
               <Typography variant="subtitle1" align="center" mb={2}>
@@ -100,7 +135,7 @@ export default function ClusterWiseData() {
               >
                 <PolarGrid />
                 <PolarAngleAxis dataKey="subject" />
-                <PolarRadiusAxis angle={30} domain={[0, 100]} />
+                <PolarRadiusAxis />
                 <Radar
                   name="Cluster"
                   dataKey="A"
@@ -112,7 +147,7 @@ export default function ClusterWiseData() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid item xs={12} md={6}>
           <Card>
             <CardContent>
               <Typography variant="subtitle1" align="center" mb={2}>
@@ -124,27 +159,26 @@ export default function ClusterWiseData() {
                 <YAxis />
                 <Tooltip />
                 <Legend />
-                <Bar dataKey="value" fill="#82ca9d" />
+                <Bar dataKey="Monthly Spend" fill="#8884d8" />
+                <Bar dataKey="E-commerce Spend" fill="#82ca9d" />
               </BarChart>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid item xs={12} md={6}>
           <Card>
             <CardContent>
               <Typography variant="subtitle1" align="center" mb={2}>
                 Quadrant Chart
               </Typography>
               <svg width={300} height={240} style={{ background: "#f5f5f5" }}>
-                {/* Draw axes */}
                 <line x1={30} y1={120} x2={270} y2={120} stroke="#888" />
                 <line x1={150} y1={30} x2={150} y2={210} stroke="#888" />
-                {/* Draw points */}
                 {quadrantData.map((pt, idx) => (
                   <circle
                     key={idx}
-                    cx={pt.x * 50 + 50}
-                    cy={pt.y * 40 + 40}
+                    cx={pt.x * 10 + 50}
+                    cy={240 - pt.y / 100 + 30}
                     r={8}
                     fill="#8884d8"
                   />
@@ -152,10 +186,10 @@ export default function ClusterWiseData() {
                 {quadrantData.map((pt, idx) => (
                   <text
                     key={"label-" + idx}
-                    x={pt.x * 50 + 50}
-                    y={pt.y * 40 + 40 - 12}
+                    x={pt.x * 10 + 50}
+                    y={240 - pt.y / 100 + 20}
                     textAnchor="middle"
-                    fontSize={14}
+                    fontSize={12}
                     fill="#333"
                   >
                     {pt.label}
@@ -165,17 +199,18 @@ export default function ClusterWiseData() {
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={6} lg={3}>
+        <Grid item xs={12} md={6}>
           <Card>
             <CardContent>
               <Typography variant="subtitle1" align="center" mb={2}>
-                Insights Table
+                Top 5 Cities
               </Typography>
               <Table>
                 <TableBody>
-                  {tableRows.map((row, idx) => (
+                  {topCities.map(([city, count], idx) => (
                     <TableRow key={idx}>
-                      <TableCell>{row}</TableCell>
+                      <TableCell>{city}</TableCell>
+                      <TableCell>{count}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
