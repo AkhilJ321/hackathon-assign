@@ -68,10 +68,16 @@ const lineData = [
 ];
 
 const barData = [
-  { name: "A", value: 120 },
-  { name: "B", value: 200 },
-  { name: "C", value: 150 },
-  { name: "D", value: 80 },
+  { name: "Realme", value: 47 },
+  { name: "Vivo", value: 40 },
+  { name: "Oneplus", value: 40 },
+ 
+  { name: "Motorola", value: 39 },
+  { name: "Xiomi", value: 39 },
+  { name: "Nokia", value: 36 },
+  { name: "Apple", value: 35 },
+  { name: "GooglePixel", value: 33 },
+  { name: "Oppo", value: 32 }
 ];
 
 // function transformData(data) {
@@ -351,7 +357,7 @@ export default function Dashboard() {
         <Card sx={{ height: "100%" }}>
           <CardContent sx={{ height: "100%" }}>
             <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-              Bar Chart Overview
+              Number Of Users vs PhoneBrand
             </Typography>
             <ResponsiveContainer width="100%" height={350}>
               <BarChart data={barData}>
