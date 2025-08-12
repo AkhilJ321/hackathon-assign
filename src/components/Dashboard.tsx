@@ -3,8 +3,18 @@
 // import TimeRangeDropdown from "./TimeRangeDropdown";
 // import { Box, Button } from "@mui/material";
 import UserSegments from "./UserSegments";
-import Papa from 'papaparse';
-import { Box, Button, Card, CardContent, FormControl, InputLabel, MenuItem, Select, Typography } from "@mui/material";
+import Papa from "papaparse";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
+  Typography,
+} from "@mui/material";
 // import Dropdown from "./Dropdown";
 import { useState } from "react";
 import {
@@ -17,17 +27,22 @@ import {
   Legend,
   ResponsiveContainer,
   BarChart,
-  Bar
+  Bar,
 } from "recharts";
+import Overview from "./Overview";
+import ClusterWiseData from "./ClusterWiseData";
 
 const xAxisOptions = [
   { key: "ScreenTime", label: "Screen Time" },
   { key: "DataUsage", label: "Data usage" },
   { key: "NumberOfApps", label: "Number of apps" },
-  { key: "TotalExpenditure", label: "Total expenditure (Monthly Recharge+E-commerse spent)" },
+  {
+    key: "TotalExpenditure",
+    label: "Total expenditure (Monthly Recharge+E-commerse spent)",
+  },
   { key: "GamingTime", label: "Gaming Time" },
   { key: "SocialMediaTime", label: "Social Media Time" },
-  { key: "StreamingTime", label: "Streaming Time" }
+  { key: "StreamingTime", label: "Streaming Time" },
 ];
 
 const datasets: Record<string, any[]> = {
@@ -96,14 +111,14 @@ const barData = [
 // }
 
 // Example usage:
-console.log('helo')
+console.log("helo");
 fetch("../datsets_1/gaming_users.csv")
-  .then(res => res.text())
-  .then(csv => {
+  .then((res) => res.text())
+  .then((csv) => {
     const parsed = Papa.parse(csv, { header: true }).data;
-    console.log('11111111111111111')
+    console.log("11111111111111111");
     const datasets = transformData(parsed);
-    console.log('hi')
+    console.log("hi");
     console.log(datasets);
   });
 
@@ -125,13 +140,17 @@ export default function Dashboard() {
     //     </Box>
     <Box p={3}>
       {/* Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
         <Typography variant="h5" fontWeight="bold">
           Analytics Dashboard
         </Typography>
         <Button variant="contained">Download</Button>
       </Box>
-
 
       {/* Dropdowns
       <Box display="flex" gap={2} mb={3}>
@@ -189,7 +208,7 @@ export default function Dashboard() {
         </CardContent>
       </Card> */}
 
-       {/* Filters Card */}
+      {/* Filters Card */}
       <Card sx={{ mb: 4 }}>
         <CardContent>
           <Box display="flex" gap={2}>
@@ -229,15 +248,9 @@ export default function Dashboard() {
         </CardContent>
       </Card>
 
-
-    {/* Charts Grid */}
-      <Box
-       display="grid"
-  gridTemplateColumns="repeat(2, 1fr)"
-  gap={2}
-  mb={4}
-      >
-      {/* <Box
+      {/* Charts Grid */}
+      <Box display="grid" gridTemplateColumns="repeat(2, 1fr)" gap={2} mb={4}>
+        {/* <Box
         display="flex" justifyContent="justify" gap={2}
         
       >  */}
@@ -247,7 +260,7 @@ export default function Dashboard() {
               <Typography variant="subtitle1" gutterBottom>
                 Line Chart {index + 1}
               </Typography>
-              <ResponsiveContainer width="100%" height={200}>
+              <ResponsiveContainer width={300} height={300}>
                 <LineChart data={lineData}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
@@ -266,71 +279,92 @@ export default function Dashboard() {
         ))} */}
 
         {/* Dynamic Line Chart */}
-      {/* Dynamic Line Chart */}
-  <Card sx={{ height: "100%" }}>
-    <CardContent sx={{ height: "100%" }}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-        <Typography variant="subtitle1" fontWeight="bold">
-          Age Distribution Comparision
-        </Typography>
+        {/* Dynamic Line Chart */}
+        <Card sx={{ height: "100%" }}>
+          <CardContent sx={{ height: "100%" }}>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              mb={2}
+            >
+              <Typography variant="subtitle1" fontWeight="bold">
+                Age Distribution Comparision
+              </Typography>
 
-        {/* Dropdown for X-axis selection */}
-        <FormControl size="small" sx={{ minWidth: 200 }}>
-          <InputLabel >X-Axis Category</InputLabel>
-          <Select
-            value={lineChartFilter}
-            onChange={(e) => setLineChartFilter(e.target.value)}
-          >
-            {xAxisOptions.map((opt) => (
-      <MenuItem key={opt.key} value={opt.key}>
-        {opt.label}
-      </MenuItem>
-    ))}
-          </Select>
-        </FormControl>
+              {/* Dropdown for X-axis selection */}
+              <FormControl size="small" sx={{ minWidth: 200 }}>
+                <InputLabel>X-Axis Category</InputLabel>
+                <Select
+                  value={lineChartFilter}
+                  onChange={(e) => setLineChartFilter(e.target.value)}
+                >
+                  {xAxisOptions.map((opt) => (
+                    <MenuItem key={opt.key} value={opt.key}>
+                      {opt.label}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Box>
+
+            <ResponsiveContainer width="100%" height={350}>
+              <LineChart data={datasets[lineChartFilter]}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis
+                  dataKey="label"
+                  label={{
+                    value: `X Axis: ${lineChartFilter}`, // dynamic label
+                    position: "insideRight",
+                    offset: 15,
+                  }}
+                />
+                <YAxis
+                  label={{ value: "Age", angle: -90, position: "insideLeft" }}
+                />
+                <Tooltip />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="male"
+                  stroke="#3f51b5"
+                  name="Male"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="female"
+                  stroke="#f50057"
+                  name="Female"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="others"
+                  stroke="#9e9e9e"
+                  name="Others"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        {/* Bar Chart */}
+        <Card sx={{ height: "100%" }}>
+          <CardContent sx={{ height: "100%" }}>
+            <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+              Bar Chart Overview
+            </Typography>
+            <ResponsiveContainer width="100%" height={350}>
+              <BarChart data={barData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="value" fill="#82ca9d" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
       </Box>
-
-      <ResponsiveContainer width="100%" height={350}>
-        <LineChart data={datasets[lineChartFilter]}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis
-            dataKey="label"
-            label={{
-              value: `X Axis: ${lineChartFilter}`, // dynamic label
-              position: "insideRight",
-              offset: 15,
-            }}
-          />
-          <YAxis label={{ value: "Age", angle: -90, position: "insideLeft" }} />
-          <Tooltip />
-          <Legend />
-          <Line type="monotone" dataKey="male" stroke="#3f51b5" name="Male" />
-          <Line type="monotone" dataKey="female" stroke="#f50057" name="Female" />
-          <Line type="monotone" dataKey="others" stroke="#9e9e9e" name="Others" />
-        </LineChart>
-      </ResponsiveContainer>
-    </CardContent>
-  </Card>
-
-  {/* Bar Chart */}
-  <Card sx={{ height: "100%" }}>
-    <CardContent sx={{ height: "100%" }}>
-      <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
-        Bar Chart Overview
-      </Typography>
-      <ResponsiveContainer width="100%" height={350}>
-        <BarChart data={barData}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="name" />
-          <YAxis />
-          <Tooltip />
-          <Bar dataKey="value" fill="#82ca9d" />
-        </BarChart>
-      </ResponsiveContainer>
-    </CardContent>
-  </Card>
-      </Box>
-
 
       {/* </Box> */}
 
@@ -378,10 +412,8 @@ export default function Dashboard() {
         </Grid>
       </Grid> */}
 
-      {/* User Segments */}
-      <Box mt={4}>
-        <UserSegments />
-      </Box>
+      <Overview />
+      <ClusterWiseData />
     </Box>
   );
 }

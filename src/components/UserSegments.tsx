@@ -2,6 +2,7 @@ import { Tabs, Tab, Box, Typography, Button } from "@mui/material";
 import { useState } from "react";
 import SegmentOverviewChart from "./SegmentOverviewChart";
 import SegmentPerformanceChart from "./SegmentPerformanceChart";
+import SizeOfEachCluster from "./Charts/SizeOfEachCluster.tsx";
 
 export default function UserSegments() {
   const [tab, setTab] = useState(0);
@@ -29,8 +30,7 @@ export default function UserSegments() {
             </Box>
           </Box>
           <Box display="flex" gap={2}>
-            <SegmentOverviewChart />
-            <SegmentPerformanceChart />
+            <SizeOfEachCluster/>
           </Box>
         </Box>
       )}

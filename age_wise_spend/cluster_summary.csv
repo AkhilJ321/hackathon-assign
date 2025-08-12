@@ -1,0 +1,5 @@
+,Cluster,Cluster Name,Count,Age,Social Media Time (hrs/day),Calls Duration (mins/day),E-commerce Spend (INR/month),Actionable Insight
+0,0,Mature High Spender,4507,40.83,1.74,155.26,7298.14,Upsell premium services
+1,1,Mature Low Spender,4331,49.83,3.6,148.83,2686.51,Target with social media ads
+2,2,Young High Spender,4388,35.13,4.72,141.85,7450.55,Upsell premium services
+3,3,Young Low Spender,4460,24.83,3.0,159.41,2813.44,Retention / low spend segment
